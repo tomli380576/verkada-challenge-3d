@@ -7,6 +7,7 @@ import { Wall } from './wall';
 import { FloorPlanData } from './models/floorPlanData';
 import { FloorplanService } from './floorPlan.service';
 import THREE from 'three';
+import { Button } from '@mui/material';
 
 function App() {
   const wallHeight = 5;
@@ -27,14 +28,27 @@ function App() {
     return <FlyControls movementSpeed={10} dragToLook={true} />
   };
 
+  function Floor(props: { x_size: number, z_size: number }) {
+    return (
+      <mesh position={[props.x_size / 2 - 0.45, -wallHeight / 2 - 0.05, props.z_size / 2 - 0.45]}>
+        <boxBufferGeometry args={[props.x_size - 0.1, 0.1, props.z_size - 0.1]} />
+        <meshPhongMaterial color="#bbbbbb" />
+      </mesh>
+    )
+  }
+
   return (
     <div
       className="App"
-      style={{ width: window.innerWidth, height: window.innerHeight }}
     >
+      <div style={{ position: "absolute", zIndex: 10 }}>
+        <Button variant="contained" className="UI-buttons" onClick={() => { console.log('sdasda') }}>Edit Camera</Button>
+        <Button variant="contained" className="UI-buttons" onClick={() => { console.log('sdasda') }}>Finish Edit</Button>
+        <Button variant="contained" className="UI-buttons" onClick={() => { FloorplanService.exportFloorPlan(floorPlanData) }}>Save</Button>
+      </div>
       <Canvas
         shadows
-        camera={{ position: [5, 5, -5] }}>
+        camera={{ position: [5, 5, -5] }} style={{ width: window.innerWidth, height: window.innerHeight }}>
 
         <CameraController />
         <FlyControls movementSpeed={10} dragToLook={true} />
@@ -43,12 +57,12 @@ function App() {
         <pointLight color="white" intensity={0.8} position={[10, 10, 10]} />
         <axesHelper position={[0, 0, 0]} args={[50]} />
 
-        <group position={[-floorPlanData.width/2, 0, -floorPlanData.height/2]}>
+        <group>
           {renderFloorPlan(floorPlanData)}
+          <Floor x_size={floorPlanData.width} z_size={floorPlanData.height} />
         </group>
       </Canvas>
     </div>
-
   );
 }
 
@@ -65,5 +79,7 @@ function renderFloorPlan(floorPlanData: FloorPlanData) {
   }
   return group;
 }
+
+
 
 export default App;
