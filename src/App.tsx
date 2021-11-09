@@ -1,32 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { FlyControls } from "@react-three/drei";
+import { useEffect, useState } from 'react';
+import { Canvas } from '@react-three/fiber'
+import { FlyControls, OrbitControls } from "@react-three/drei";
 import './App.css';
-import { TransparentWall, Wall } from './wall';
+import { TransparentWall, Wall, CameraObj } from './wall';
 import { FloorPlanData } from './models/floorPlanData';
 import { FloorplanService } from './floorPlan.service';
-import THREE from 'three';
 import { Button } from '@mui/material';
 
 function App() {
   const wallHeight = 5;
 
-  let floorPlanData = FloorplanService.hardcodedData();
-  console.log(floorPlanData);
-
-  function CameraController() {
-    const { camera, gl } = useThree();
-
-    useEffect(
-      () => {
-        const controls = new OrbitControls(camera, gl.domElement);
-        controls.screenSpacePanning = true;
-      },
-      [camera, gl.domElement]
-    );
-    return <FlyControls movementSpeed={10} dragToLook={true} />
-  };
+  //let floorPlanData: FloorPlanData = FloorplanService.hardcodedData();
+  const [floorPlanData, setFloorPlanData] = useState(FloorplanService.hardcodedData());
 
   function Floor(props: { x_size: number, z_size: number }) {
     return (
@@ -35,6 +20,30 @@ function App() {
         <meshPhongMaterial color="#bbbbbb" />
       </mesh>
     )
+  }
+
+  function renderFloorPlan(floorPlanData: FloorPlanData) {
+    let group = [];
+
+    for (let z = 0; z < floorPlanData.floorPlan.length; z++) {
+      for (let x = 0; x < floorPlanData.floorPlan[z].length; x++) {
+        switch (floorPlanData.floorPlan[z][x]) {
+          case 0: group.push(<TransparentWall position={[x, 0, z]} y_size={5} data_x={z} data_y={x} onClick={getClickedLocation} />); break;
+          case 1: group.push(<Wall position={[x, 0, z]} y_size={5} data_x={z} data_y={x} />); break;
+          case 2: group.push(<CameraObj position={[x, 0, z]} y_size={5} data_x={z} data_y={x} />); break;
+        }
+      }
+    }
+    console.log(floorPlanData);
+    return group;
+  }
+
+  function getClickedLocation(x: number, y: number) {
+    console.log(x, y);
+    let temp = floorPlanData;
+    temp.floorPlan[y][x] = 2;
+    setFloorPlanData(temp);
+    //floorPlanData.floorPlan[y][x] = 2;
   }
 
   return (
@@ -50,7 +59,7 @@ function App() {
         shadows
         camera={{ position: [5, 5, -5] }} style={{ width: window.innerWidth, height: window.innerHeight }}>
 
-        <CameraController />
+        <OrbitControls />
         <FlyControls movementSpeed={10} dragToLook={true} />
 
         <ambientLight intensity={0.2} />
@@ -66,19 +75,7 @@ function App() {
   );
 }
 
-function renderFloorPlan(floorPlanData: FloorPlanData) {
-  let group = [];
 
-  for (let z = 0; z < floorPlanData.floorPlan.length; z++) {
-    for (let x = 0; x < floorPlanData.floorPlan[z].length; x++) {
-      switch (floorPlanData.floorPlan[z][x]) {
-        case 0: group.push(<TransparentWall position={[x, 0, z]} y_size={5} />); break;
-        case 1: group.push(<Wall position={[x, 0, z]} y_size={5} />); break;
-      }
-    }
-  }
-  return group;
-}
 
 
 
