@@ -3,7 +3,7 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FlyControls } from "@react-three/drei";
 import './App.css';
-import { Wall } from './wall';
+import { TransparentWall, Wall } from './wall';
 import { FloorPlanData } from './models/floorPlanData';
 import { FloorplanService } from './floorPlan.service';
 import THREE from 'three';
@@ -30,8 +30,8 @@ function App() {
 
   function Floor(props: { x_size: number, z_size: number }) {
     return (
-      <mesh position={[props.x_size / 2 - 0.45, -wallHeight / 2 - 0.05, props.z_size / 2 - 0.45]}>
-        <boxBufferGeometry args={[props.x_size - 0.1, 0.1, props.z_size - 0.1]} />
+      <mesh position={[(props.x_size * 0.9 + 0.9) / 2 - 0.45, -wallHeight / 2 - 0.05, (props.z_size * 0.9 + 0.9) / 2 - 0.45]}>
+        <boxBufferGeometry args={[(props.x_size * 0.9 + 0.9), 0.1, (props.z_size * 0.9 + 0.9)]} />
         <meshPhongMaterial color="#bbbbbb" />
       </mesh>
     )
@@ -71,9 +71,9 @@ function renderFloorPlan(floorPlanData: FloorPlanData) {
 
   for (let z = 0; z < floorPlanData.floorPlan.length; z++) {
     for (let x = 0; x < floorPlanData.floorPlan[z].length; x++) {
-      if (floorPlanData.floorPlan[z][x] === 1) {
-        //return (<Wall position={[x, y, 0]} y_size={5} />);
-        group.push(<Wall position={[x, 0, z]} y_size={5} />);
+      switch (floorPlanData.floorPlan[z][x]) {
+        case 0: group.push(<TransparentWall position={[x, 0, z]} y_size={5} />); break;
+        case 1: group.push(<Wall position={[x, 0, z]} y_size={5} />); break;
       }
     }
   }
