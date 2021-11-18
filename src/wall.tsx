@@ -32,7 +32,7 @@ export function TransparentWall(props: BoxProps) {
       onPointerDown={(e) => { e.stopPropagation(); props.onClick!(props.data_x, props.data_y) }}
     >
       <boxBufferGeometry args={[0.9, props.y_size, 0.9]} />
-      <meshPhongMaterial color="#ffffff" opacity={hovered ? 0.1 : 0.0} transparent />
+      <meshPhongMaterial color="#ffffff" opacity={hovered ? 0.4 : 0.0} transparent />
     </mesh>
   );
 }
